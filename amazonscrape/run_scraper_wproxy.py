@@ -6,7 +6,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from time import sleep
 from random import randint
-from extract_data import get_week_data, get_book_data, all_sundays_of_year
+from extract_data import get_week_data, all_sundays_of_year
 import csv
 
 current_date = datetime.now().strftime("%Y-%m-%d")
@@ -22,14 +22,13 @@ weeks = []  #if only doing certain weeks, add them into this list in 'YYYY-MM-DD
 for year in years:
     weeks.extend(all_sundays_of_year(year))
 
-dat = [] #initialize list to hold data
-
 #create csv file we are writing to
 #comment this out if you are appending to an existing csv
 with open('amazon_charts.csv', 'w') as file:
     writer = csv.writer(file)
     writer.writerow(fieldnames)
 
+#get weeks already in the csv to avoid duplicates
 with open('amazon_charts.csv', 'r') as file:
     reader = csv.DictReader(file)
     existing_weeks = {row['week'] for row in reader}
@@ -38,7 +37,7 @@ try:
     with open('amazon_charts.csv', mode='a', newline='') as file: #append to existing csv
         writer = csv.DictWriter(file, fieldnames=fieldnames)
 
-       #get master list of books
+        #get master list of books
         #indiv book data built in
         for week in weeks:
             if week > current_date:
