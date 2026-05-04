@@ -15,29 +15,31 @@ fieldnames = ['week', 'rank', 'author', 'title', 'href', 'blurb', 'pub', 'pub_da
 
 dat = [] #do not comment this out
 
-years = [2017, 2018, 2019, 2020, 2021,2022,2023,2024,2025, 2026] #if only doing for one year, make sure this is still a list
+years = [2023, 2024, 2025] #if only doing for one year, make sure this is still a list
 
 weeks = []  #if only doing certain weeks, add them into this list in 'YYYY-MM-DD' format
 #then comment out this first for loop (for year in years)
 for year in years:
     weeks.extend(all_sundays_of_year(year))
 
+dat = [] #initialize list to hold data
+
 #create csv file we are writing to
-#comment this out if you are appending to an existing csv
+#comment this out if you are appending to an existing csv and uncomment next chunk
 with open('amazon_charts.csv', 'w') as file:
     writer = csv.writer(file)
     writer.writerow(fieldnames)
 
-#get weeks already in the csv to avoid duplicates
-with open('amazon_charts.csv', 'r') as file:
-    reader = csv.DictReader(file)
-    existing_weeks = {row['week'] for row in reader}
+#uncomment this part if you are appending to an existing csv named amazon_charts.csv
+# with open('amazon_charts.csv', 'r') as file:
+#     reader = csv.DictReader(file)
+#     existing_weeks = {row['week'] for row in reader}
 
 try:
     with open('amazon_charts.csv', mode='a', newline='') as file: #append to existing csv
         writer = csv.DictWriter(file, fieldnames=fieldnames)
 
-        #get master list of books
+       #get master list of books
         #indiv book data built in
         for week in weeks:
             if week > current_date:
@@ -46,18 +48,19 @@ try:
             elif week < '2017-05-14':
                 print(f"Week {week} is before the earliest week of the charts. Skipping.")
                 continue
-            elif week in existing_weeks:
-                print(f"Week {week} already exists in the CSV. Skipping.")
-                continue
+            #uncomment this part for appending to an existing csv
+            # elif week in existing_weeks:
+            #     print(f"Week {week} already exists in the CSV. Skipping.")
+            #     continue
             else:
-                try:
-                    week_dat = get_week_data(week)
-                    writer.writerows(week_dat) #write week data to csv
-                    dat.extend(week_dat)
-                    print(f"Finished week: {week}")
-                    sleep(randint(1,4))
-                except Exception as e:
-                    print(f"An error occurred while processing week {week}: {e}")
+                # try:
+                week_dat = get_week_data(week)
+                writer.writerows(week_dat) #write week data to csv
+                dat.extend(week_dat)
+                print(f"Finished week: {week}")
+                sleep(randint(1,4))
+                # except Exception as e:
+                #     print(f"An error occurred while processing week {week}: {e}")
 
 except FileNotFoundError:
     print("File not found. Ensure 'amazon_charts.csv' exists.")
